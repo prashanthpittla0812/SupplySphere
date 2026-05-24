@@ -109,7 +109,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: /sign in/i }));
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('Login failed. Please try again.');
+      expect(toast.error).toHaveBeenCalledWith('Invalid email or password');
     });
 
     expect(mockNavigate).not.toHaveBeenCalled();
@@ -154,7 +154,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: /sign in/i }));
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('Login failed. Please try again.');
+      expect(toast.error).toHaveBeenCalledWith('Invalid email or password');
     });
 
     expect(mockNavigate).not.toHaveBeenCalled();
