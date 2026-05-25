@@ -22,9 +22,12 @@ async def lifespan(app: FastAPI):
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
     for subdir in ["images", "documents", "invoices"]:
         os.makedirs(os.path.join(settings.UPLOAD_DIR, subdir), exist_ok=True)
-    # Auto-seed database if empty
-    from app.db.seeds.runner import auto_seed_if_empty
-    await auto_seed_if_empty()
+    # Auto-seed database if empty (safe — won't crash server on failure)
+    try:
+        from app.db.seeds.runner import auto_seed_if_empty
+        await auto_seed_if_empty()
+    except Exception as e:
+        print(f"[STARTUP] Auto-seed error (non-fatal): {e}")
     yield
     # Shutdown
     pass

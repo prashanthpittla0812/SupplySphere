@@ -244,6 +244,8 @@ async def seed_all(users_only: bool = False, silent: bool = False):
     """
     log = SeedLogger(silent=silent)
 
+    create_tables()
+
     async with AsyncSessionLocal() as db:
         try:
             if users_only:
@@ -275,11 +277,26 @@ async def seed_all(users_only: bool = False, silent: bool = False):
 
 
 async def auto_seed_if_empty():
-    """Called on app startup — seeds only when users table is empty."""
+    """Called on app startup — seeds only when users table is empty.
+
+    Ensures tables exist before checking emptiness so fresh databases
+    (e.g. Neon PostgreSQL on first deploy) do not crash with a
+    'relation does not exist' error.
+    """
+    try:
+        create_tables()
+    except Exception as e:
+        print(f"[AUTO-SEED] Could not create tables: {e}")
+        return
+
     async with AsyncSessionLocal() as db:
-        if await _table_is_empty(db, User):
-            print("[AUTO-SEED] Database is empty. Running initial seed...")
-            await seed_database(db, SeedLogger(silent=False))
-            print("[AUTO-SEED] Initial seed complete.")
-        else:
-            print("[AUTO-SEED] Database already populated \u2014 skipping.")
+        try:
+            if await _table_is_empty(db, User):
+                print("[AUTO-SEED] Database is empty. Running initial seed...")
+                await seed_database(db, SeedLogger(silent=False))
+                print("[AUTO-SEED] Initial seed complete.")
+            else:
+                print("[AUTO-SEED] Database already populated \u2014 skipping.")
+        except Exception as e:
+            await db.rollback()
+            print(f"[AUTO-SEED] Seeding failed: {e}", file=sys.stderr)

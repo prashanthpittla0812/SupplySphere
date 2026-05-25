@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router';
 import { MainLayout } from './components/layout/main-layout';
 import { LoginPage } from './pages/login';
+import { RegisterPage } from './pages/register';
 import { DashboardPage } from './pages/dashboard';
 import { VendorsPage } from './pages/vendors';
 import { InventoryPage } from './pages/inventory';
@@ -28,6 +29,10 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/register',
+    element: <RegisterPage />,
   },
   {
     path: '/',
