@@ -16,9 +16,6 @@ from app.middleware.rate_limit import limiter
 from app.ws.manager import manager
 from app.utils.file_storage import file_storage
 
-@app.get("/")
- async def root():
-    return {"message": "SupplySphere Backend Running Successfully"}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
@@ -34,11 +31,17 @@ app = FastAPI(
     title="SupplySphere API",
     version="1.0.0",
     description="Enterprise Supply Chain Management System API",
-    docs_url="/api/docs",
-    redoc_url="/api/redoc",
-    openapi_url="/api/openapi.json",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
     lifespan=lifespan,
 )
+
+
+@app.get("/")
+async def root():
+    return {"message": "SupplySphere Backend Running Successfully"}
+
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -47,7 +50,7 @@ if settings.RATE_LIMIT_ENABLED:
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
