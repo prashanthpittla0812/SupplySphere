@@ -12,7 +12,12 @@ IS_SQLITE = "sqlite" in DATABASE_URL
 def _get_async_url():
     if IS_SQLITE:
         return DATABASE_URL
-    return DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+    url = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+    # asyncpg does not accept sslmode in query string — translate it
+    url = url.replace("sslmode=require", "ssl=require")
+    url = url.replace("sslmode=prefer", "ssl=prefer")
+    url = url.replace("sslmode=disable", "ssl=false")
+    return url
 
 
 def _get_sync_url():
