@@ -11,7 +11,7 @@ IS_SQLITE = "sqlite" in DATABASE_URL
 
 def _get_async_url():
     if IS_SQLITE:
-        return DATABASE_URL.replace("sqlite+aiosqlite://", "sqlite+aiosqlite://")
+        return DATABASE_URL
     return DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
 
 
@@ -30,9 +30,29 @@ sync_engine_kwargs = {"echo": settings.DEBUG}
 if IS_SQLITE:
     async_engine_kwargs["connect_args"] = {"check_same_thread": False}
     sync_engine_kwargs["connect_args"] = {"check_same_thread": False}
+else:
+    async_engine_kwargs.update(
+        {
+            "pool_size": 20,
+            "max_overflow": 10,
+            "pool_pre_ping": True,
+            "pool_recycle": 3600,
+        }
+    )
+    sync_engine_kwargs.update(
+        {
+            "pool_size": 10,
+            "max_overflow": 5,
+            "pool_pre_ping": True,
+            "pool_recycle": 3600,
+        }
+    )
 
 async_engine = create_async_engine(ASYNC_DATABASE_URL, **async_engine_kwargs)
 sync_engine = create_engine(SYNC_DATABASE_URL, **sync_engine_kwargs)
+
+POOL_SIZE = async_engine_kwargs.get("pool_size", 5)
+MAX_OVERFLOW = async_engine_kwargs.get("max_overflow", 10)
 
 
 if IS_SQLITE:
