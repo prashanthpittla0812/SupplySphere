@@ -29,8 +29,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title=settings.PROJECT_NAME,
-    version=settings.VERSION,
+    title="SupplySphere API",
+    version="1.0.0",
     description="Enterprise Supply Chain Management System API",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
