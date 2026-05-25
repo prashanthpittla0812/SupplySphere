@@ -16,7 +16,9 @@ from app.middleware.rate_limit import limiter
 from app.ws.manager import manager
 from app.utils.file_storage import file_storage
 
-
+@app.get("/")
+ async def root():
+    return {"message": "SupplySphere Backend Running Successfully"}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
@@ -164,3 +166,4 @@ async def websocket_endpoint(websocket):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app.main:app", host=settings.HOST, port=settings.PORT, reload=settings.DEBUG)
+
